@@ -1,0 +1,95 @@
+name: "fuzz"
+description: "Runs fuzzing targets using go-ci-fuzz"
+inputs:
+  version:
+    description: "Version of go-ci-fuzz, e.g. latest or 0.1.0"
+    required: false
+    default: "0.1.0"
+  source-path:
+    description: "Path to the project's source code, current directory by default."
+    required: false
+    default: "."
+  fail-fast:
+    description: "Whether to continue fuzzing other targets if failing input was found."
+    required: false
+    default: "false"
+  fuzz-time:
+    description: "Cumulative time FuzzTests will run, in Go time.Duration format."
+    required: false
+    default: "5m"
+  artifact-name:
+    description: "Name of the artifact"
+    required: false
+    default: "failing-inputs"
+runs:
+  using: "composite"
+  steps:
+    - name: Compute Archive for Runner Environment
+      id: archive-info
+      shell: bash
+      run: |
+        set -eu
+        # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+        # The operating system of the runner executing the job. Possible values are Linux, Windows, or macOS. For example, Windows
+        EXE_EXT=""
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          ARCHIVE_OS=Linux
+          ARCHIVE_EXT=tar.gz
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+          ARCHIVE_OS=Windows
+          ARCHIVE_EXT=zip
+          EXE_EXT=".exe"
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          ARCHIVE_OS=Darwin
+          ARCHIVE_EXT=tar.gz
+        else
+          echo "$RUNNER_OS not supported"
+          exit 1
+        fi
+        
+        # The architecture of the runner executing the job. Possible values are X86, X64, ARM, or ARM64.
+        if [ "$RUNNER_ARCH" == "X86" ]; then
+          ARCHIVE_ARCH="i386"
+        elif [ "$RUNNER_ARCH" == "X64" ]; then
+          ARCHIVE_ARCH="x86_64"
+        elif [ "$RUNNER_ARCH" == "ARM64" ]; then
+          ARCHIVE_ARCH="arm64"
+        else
+          echo "$RUNNER_ARCH not supported"
+          exit 1
+        fi
+       
+        #go-ci-fuzz_Darwin_x86_64.tar.gz  
+        echo "ARCHIVE_PATH=go-ci-fuzz_${ARCHIVE_OS}_${ARCHIVE_ARCH}.${ARCHIVE_EXT}" >> "$GITHUB_OUTPUT"
+        echo "EXE_NAME=go-ci-fuzz${EXE_EXT}" >> "$GITHUB_OUTPUT"
+    - id: fetch-asset
+      name: Get Release Asset
+      uses: dsaltares/fetch-gh-release-asset@3942ce82f1192754cd487a86f03eef6eeb89b5da # 1.1.0
+      with:
+        repo: 'form3tech-oss/go-ci-fuzz'
+        version: ${{ inputs.version == 'latest' && 'latest' || format('tags/v%s', inputs.version) }}
+        file: ${{ steps.archive-info.outputs.ARCHIVE_PATH }}
+    - id: extract
+      name: Extract go-ci-fuzz
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          unzip -u ${{ steps.archive-info.outputs.ARCHIVE_PATH }} go-ci-fuzz.exe -d "$RUNNER_TEMP" 
+        else 
+          tar -zxvf ${{ steps.archive-info.outputs.ARCHIVE_PATH }} --directory "$RUNNER_TEMP" go-ci-fuzz
+        fi
+    - id: fuzz
+      name: "Fuzz"
+      shell: bash
+      working-directory: "${{ inputs.source-path }}"
+      run: |
+        TEMP_DIR="$RUNNER_TEMP/failing-inputs"
+        mkdir -p $TEMP_DIR
+        echo "FAILING_INPUTS_DIR=${TEMP_DIR}" >> "$GITHUB_OUTPUT"
+        ${RUNNER_TEMP}/${{ steps.archive-info.outputs.EXE_NAME }} fuzz ./... --fuzz-time "${{ inputs.fuzz-time }}" --fail-fast="${{ inputs.fail-fast }}" --out="${TEMP_DIR}/"
+    - uses: actions/upload-artifact@v3
+      if: 'failure()'
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.fuzz.outputs.FAILING_INPUTS_DIR }}/
+        if-no-files-found: ignore

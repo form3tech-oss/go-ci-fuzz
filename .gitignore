@@ -1,0 +1,4 @@
+/go-ci-fuzz
+.idea/
+
+dist/
