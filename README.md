@@ -1,15 +1,16 @@
 # Go CI Fuzz
 
-`go-ci-fuzz` is a CLI and a set of GitHub Actions that help you run [Native Go Fuzz Tests](https://go.dev/security/fuzz/) as part of your CI.
+CLI and set of GitHub Actions to help you run [Native Go Fuzz Tests](https://go.dev/security/fuzz/) in CI. 
 
-It's a light wrapper around `go test -fuzz=` that supports multiple test targets.
+It's a light wrapper around `go test -fuzz=` supporting multiple test targets.
 
 ## Motivation
 
-`go-ci-fuzz` was created to achieve a developer friendly and lightweight way of running Native Go Fuzz Tests in Continuous Integration pipelines.
-Current alternatives (ClusterFuzzLite, go-fuzz) don't support Native Go Fuzzing or support Native Go fuzzing inadequately through wrappers.
+This project was created to achieve a developer friendly and lightweight way of running _Native Go Fuzz Tests_ in Continuous Integration pipelines.
 
-## Typical Workflow
+Current alternatives (ClusterFuzzLite, go-fuzz, etc.) don't support _Native Go Fuzzing_ or only inadequately through wrappers.
+
+## Workflow
 
 ```mermaid
 flowchart LR
@@ -19,28 +20,26 @@ flowchart LR
     engineer -- 4. Commits failing inputs & fixes  the issue --> GitHub
 ```
 
+## Run
 
-## Running locally
+### Locally
 
-Although this tool is mostly meant to be used in CI pipelines it's still useful in local development. 
-If your project has many fuzz tests you can run all of them using `go-ci-fuzz`.
+Although this tool is meant for CI pipelines, it's still useful in local development. 
 
-```bash
+If your project has many fuzz tests you can run all of them with:
+
+```shell
 go install github.com/form3tech-oss/go-ci-fuzz@{version}
 go-ci-fuzz fuzz --fuzz-time 10m <packages> [--out /tmp/failures]
 ```
 
-## Run as part of GitHub Actions
+### As GitHub Action
 
-This repo contains reusable actions located in [./ci/github-actions](ci/github-actions). 
-You can reference these actions from your workflows.
+From your own workflow, you can reference our reusable Github actions located in [./ci/github-actions](ci/github-actions). 
 
-All findings will be uploaded as artifacts to the workflow run.
+All fuzz findings are uploaded as artifacts to the workflow run.
 
-Below you'll find example workflows to incorporate in your CI pipeline. 
-Feel free to adjust the fuzz-time according to your appetite.
-
-The Github Action accepts the following properties:
+Here are the Github Action properties:
 
 ```yaml
 inputs:
@@ -65,6 +64,10 @@ inputs:
     required: false
     default: "failing-inputs"
 ```
+
+## Examples 
+
+Here are some example workflows to incorporate in your CI pipelines. Feel free to adjust the fuzz-time according to your appetite!
 
 ### Fuzz incoming Pull Requests
 
