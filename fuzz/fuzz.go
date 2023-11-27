@@ -3,6 +3,7 @@ package fuzz
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -42,7 +43,7 @@ func (p *Project) relCorpusDir(target TestTarget) string {
 	return filepath.Join(pkg, "testdata/fuzz", target.Name)
 }
 
-func (p *Project) Fuzz(target TestTarget, d time.Duration) error {
+func (p *Project) Fuzz(ctx context.Context, target TestTarget, d time.Duration) error {
 	args := []string{
 		"test",
 		"-test.run=^$",
@@ -51,7 +52,7 @@ func (p *Project) Fuzz(target TestTarget, d time.Duration) error {
 		target.Package,
 	}
 
-	cmd := exec.Command("go", args...)
+	cmd := exec.CommandContext(ctx, "go", args...)
 	if p.Directory != "" {
 		cmd.Dir = p.Directory
 	}

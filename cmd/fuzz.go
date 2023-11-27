@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"github.com/form3tech-oss/go-ci-fuzz/fuzz"
 	"github.com/spf13/cobra"
 	"os"
@@ -40,7 +39,7 @@ func init() {
 }
 
 func fuzzRun(cmd *cobra.Command, args []string) {
-	ctx := context.Background()
+	ctx := cmd.Context()
 
 	quiet, err := cmd.Flags().GetBool(flagQuiet)
 	if err != nil {
@@ -100,7 +99,7 @@ func fuzzRun(cmd *cobra.Command, args []string) {
 	cmd.Printf("go-ci-fuzz: discovered %d targets, each of them will be fuzzed for %s\n", len(targets), timePerTarget)
 	for _, target := range targets {
 		cmd.Printf("go-ci-fuzz: fuzzing %s for %s\n", target, timePerTarget)
-		if err := proj.Fuzz(target, timePerTarget); err != nil {
+		if err := proj.Fuzz(ctx, target, timePerTarget); err != nil {
 			hasFailures = true
 			if inputErr, ok := err.(fuzz.FailingInputError); ok {
 				if inputErr.File != "" && out != "" {

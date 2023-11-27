@@ -1,6 +1,7 @@
 package fuzz
 
 import (
+	"context"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
@@ -11,9 +12,10 @@ import (
 
 func TestFuzz(t *testing.T) {
 	t.Run("Add() seed entry", func(t *testing.T) {
+		ctx := context.Background()
 		p := Project{Directory: "./testdata/fuzzing/seed", Quiet: true}
 
-		err := p.Fuzz(TestTarget{
+		err := p.Fuzz(ctx, TestTarget{
 			Name:        "FuzzTarget",
 			Package:     "seed",
 			RootPackage: "seed",
@@ -23,9 +25,10 @@ func TestFuzz(t *testing.T) {
 	})
 
 	t.Run("file seed entry", func(t *testing.T) {
+		ctx := context.Background()
 		p := Project{Directory: "./testdata/fuzzing/seedfile", Quiet: true}
 
-		err := p.Fuzz(TestTarget{
+		err := p.Fuzz(ctx, TestTarget{
 			Name:        "FuzzTarget",
 			Package:     "seedfile",
 			RootPackage: "seedfile",
@@ -35,6 +38,7 @@ func TestFuzz(t *testing.T) {
 	})
 
 	t.Run("new entry discovered", func(t *testing.T) {
+		ctx := context.Background()
 		p := Project{Directory: "./testdata/fuzzing/new", Quiet: true}
 
 		removeTestData := func() {
@@ -46,7 +50,7 @@ func TestFuzz(t *testing.T) {
 		removeTestData()
 		t.Cleanup(removeTestData)
 
-		err := p.Fuzz(TestTarget{
+		err := p.Fuzz(ctx, TestTarget{
 			Name:        "FuzzTarget",
 			Package:     "github.com/form3tech-oss/new",
 			RootPackage: "github.com/form3tech-oss/new",
@@ -60,9 +64,10 @@ func TestFuzz(t *testing.T) {
 	})
 
 	t.Run("no findings", func(t *testing.T) {
+		ctx := context.Background()
 		p := Project{Directory: "./testdata/fuzzing/nofindings", Quiet: true}
 
-		err := p.Fuzz(TestTarget{
+		err := p.Fuzz(ctx, TestTarget{
 			Name:        "FuzzTarget",
 			Package:     "nofindings",
 			RootPackage: "nofindings",

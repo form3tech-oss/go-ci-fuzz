@@ -19,7 +19,6 @@ flowchart LR
     engineer -- 4. Commits failing inputs & fixes  the issue --> GitHub
 ```
 
-
 ## Running locally
 
 Although this tool is mostly meant to be used in CI pipelines it's still useful in local development. 
