@@ -13,9 +13,9 @@ const (
 var rootCmd = &cobra.Command{
 	Use:   "go-ci-fuzz",
 	Short: "Run Go Fuzz targets in CI systems",
-	Long: `go-ci-fuzz implements missing functionality in 'go test -fuzz' such as
-- running multiple test targets in a single command
-- extracting failed outputs
+	Long: `Implements missing functionalities in 'go test -fuzz' such as
+- run multiple test targets in a single command
+- extract failed outputs
 - corpus management
 `,
 	Example: `go-ci-fuzz fuzz ./... --fuzz-time 10m --out /tmp/failing-inputs`,
