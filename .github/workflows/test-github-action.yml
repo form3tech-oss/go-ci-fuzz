@@ -1,0 +1,50 @@
+name: test-github-action
+
+on: [push]
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz-no-failure:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # v4.1.0
+        with:
+          go-version: stable
+      - name: Run fuzzers
+        uses: ./ci/github-actions/fuzz
+        with:
+          fuzz-time: 15s
+          fail-fast: true
+          source-path: fuzz/testdata/fuzzing/nofindings
+          version: latest
+  fuzz-failure:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # v4.1.0
+        with:
+          go-version: stable
+      - name: Run fuzzers
+        id: fuzz
+        uses: ./ci/github-actions/fuzz
+        continue-on-error: true
+        with:
+          fuzz-time: 2m
+          fail-fast: true
+          source-path: fuzz/testdata/fuzzing/new
+          version: latest
+          artifact-name: "failing-inputs-${{ matrix.os }}"
+      - name: Verify fuzzing failed
+        # https://docs.github.com/en/actions/learn-github-actions/contexts#steps-context
+        # When a continue-on-error step fails, the outcome is failure, but the final conclusion is success.
+        if: steps.fuzz.outcome != 'failure'
+        run: exit 1
