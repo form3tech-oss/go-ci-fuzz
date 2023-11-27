@@ -43,11 +43,14 @@ func (f FailingInputError) Error() string {
 	return fmt.Sprintf("failing %s input: %s", newOrSeed, f.ID)
 }
 
-func (p *Project) relCorpusDir(target TestTarget) string {
+func (p *Project) relCorpusDir(target TestTarget) (string, error) {
 	// target.Package contains the root package as well
-	// we need to strip it because it refers to the current working directory .
-	pkg := strings.TrimPrefix(strings.TrimPrefix(target.Package, target.RootPackage), "/")
-	return filepath.Join(pkg, "testdata/fuzz", target.Name)
+	// we need to strip it because it refers to the current working directory.
+	pkg, err := filepath.Rel(target.RootPackage, target.Package)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(pkg, "testdata/fuzz", target.Name), nil
 }
 
 func (p *Project) Fuzz(ctx context.Context, target TestTarget, d time.Duration) error {
@@ -83,7 +86,10 @@ func (p *Project) Fuzz(ctx context.Context, target TestTarget, d time.Duration) 
 	}
 
 	scanner := bufio.NewScanner(&stdout)
-	corpusDirectory := p.relCorpusDir(target)
+	corpusDirectory, err := p.relCorpusDir(target)
+	if err != nil {
+		return fmt.Errorf("cannot locate relative corpus directory: %w", err)
+	}
 	for scanner.Scan() {
 		line := scanner.Text()
 

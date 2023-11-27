@@ -22,7 +22,10 @@ func (p *Project) CorpusExtract(ctx context.Context, destination string, package
 	}
 
 	for _, target := range targets {
-		corpusDir := p.relCorpusDir(target)
+		corpusDir, err := p.relCorpusDir(target)
+		if err != nil {
+			return fmt.Errorf("cannot get corpus directory path: %w", err)
+		}
 
 		srcCorpusDir := filepath.Join(p.Directory, corpusDir)
 		if _, err := os.Stat(srcCorpusDir); os.IsNotExist(err) {
@@ -49,10 +52,13 @@ func (p *Project) CorpusDelete(ctx context.Context, packages ...string) error {
 	}
 
 	for _, target := range targets {
-		relDir := p.relCorpusDir(target)
+		relDir, err := p.relCorpusDir(target)
+		if err != nil {
+			return fmt.Errorf("cannot get corpus directory path: %w", err)
+		}
 
 		currentCorpusDir := filepath.Join(p.Directory, relDir)
-		err := os.RemoveAll(currentCorpusDir)
+		err = os.RemoveAll(currentCorpusDir)
 		if err != nil {
 			return fmt.Errorf("error deleting corpus entries for %q located at %s", target, relDir)
 		}
@@ -76,7 +82,10 @@ func (p *Project) CorpusMerge(ctx context.Context, external string, packages ...
 	}
 
 	for _, target := range targets {
-		corpusDir := p.relCorpusDir(target)
+		corpusDir, err := p.relCorpusDir(target)
+		if err != nil {
+			return fmt.Errorf("cannot get corpus directory path: %w", err)
+		}
 
 		currentCorpusDir := filepath.Join(p.Directory, corpusDir)
 		externalCorpusDir := filepath.Join(external, corpusDir)
