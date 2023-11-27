@@ -62,7 +62,11 @@ func (p *Project) Fuzz(ctx context.Context, target TestTarget, d time.Duration) 
 		target.Package,
 	}
 
-	cmd := exec.CommandContext(ctx, "go", args...)
+	goBin, err := exec.LookPath("go")
+	if err != nil {
+		return errors.New("go is not installed")
+	}
+	cmd := exec.CommandContext(ctx, goBin, args...)
 	if p.Directory != "" {
 		cmd.Dir = p.Directory
 	}
@@ -75,7 +79,7 @@ func (p *Project) Fuzz(ctx context.Context, target TestTarget, d time.Duration) 
 	}
 	cmd.Stderr = os.Stderr
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err == nil {
 		return nil
 	}

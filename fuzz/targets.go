@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go/scanner"
 	"go/token"
@@ -60,7 +61,11 @@ func (p *Project) listPackages(ctx context.Context, packages ...string) ([]Packa
 		"-json",
 	}, packages...)
 
-	cmd := exec.CommandContext(ctx, "go", args...)
+	goBin, err := exec.LookPath("go")
+	if err != nil {
+		return nil, errors.New("go is not installed")
+	}
+	cmd := exec.CommandContext(ctx, goBin, args...)
 	if p.Directory != "" {
 		cmd.Dir = p.Directory
 	}
