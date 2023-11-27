@@ -15,8 +15,15 @@ import (
 	"time"
 )
 
-var failingInputRegex = regexp.MustCompile(`^\s*go test -run=Fuzz([a-zA-Z0-9_]+)/([a-zA-Z0-9#]+)`)
-var failingSeedInputRegex = regexp.MustCompile(`^\s*failure while testing seed corpus entry: Fuzz([a-zA-Z0-9_]+)/([a-zA-Z0-9#]+)`)
+var (
+	failingInputRegex     = regexp.MustCompile(`^\s*go test -run=Fuzz([a-zA-Z0-9_]+)/([a-zA-Z0-9#]+)`)
+	failingSeedInputRegex = regexp.MustCompile(`^\s*failure while testing seed corpus entry: Fuzz([a-zA-Z0-9_]+)/([a-zA-Z0-9#]+)`)
+)
+
+type Project struct {
+	Directory string
+	Quiet     bool
+}
 
 type FailingInputError struct {
 	ID   string
