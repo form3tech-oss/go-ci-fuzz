@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"testing"
 )
@@ -36,19 +35,9 @@ func TestCorpusExtract(t *testing.T) {
 	t.Run("extracts fuzzing targets", func(t *testing.T) {
 		project := Project{Directory: "./testdata/corpus/multiple"}
 		ctx := context.Background()
+		tempDir := t.TempDir()
 
-		tempDir, err := os.MkdirTemp("", "go-ci-fuzz-*")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		t.Cleanup(func() {
-			if os.RemoveAll(tempDir) != nil {
-				t.Error(err)
-			}
-		})
-
-		err = project.CorpusExtract(ctx, tempDir, "...")
+		err := project.CorpusExtract(ctx, tempDir, "...")
 		if !assert.NoError(t, err, "corpus copying should not fail") {
 			return
 		}
@@ -67,15 +56,7 @@ func TestCorpusExtract(t *testing.T) {
 
 func TestCorpusDelete(t *testing.T) {
 	t.Run("deletes corpora that have matching target", func(t *testing.T) {
-		tempDir, err := os.MkdirTemp("", "go-ci-fuzz-*")
-		if err != nil {
-			t.Fatal(err)
-		}
-		t.Cleanup(func() {
-			if os.RemoveAll(tempDir) != nil {
-				t.Error(err)
-			}
-		})
+		tempDir := t.TempDir()
 
 		if err := copyDirectory(tempDir, "./testdata/corpus/multiple"); err != nil {
 			t.Fatal(err)
