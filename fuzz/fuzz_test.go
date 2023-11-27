@@ -15,7 +15,7 @@ func TestFuzz(t *testing.T) {
 		ctx := context.Background()
 		p := Project{Directory: "./testdata/fuzzing/seed", Quiet: true}
 
-		err := p.Fuzz(ctx, TestTarget{
+		err := p.Fuzz(ctx, Target{
 			Name:        "FuzzTarget",
 			Package:     "seed",
 			RootPackage: "seed",
@@ -28,7 +28,7 @@ func TestFuzz(t *testing.T) {
 		ctx := context.Background()
 		p := Project{Directory: "./testdata/fuzzing/seedfile", Quiet: true}
 
-		err := p.Fuzz(ctx, TestTarget{
+		err := p.Fuzz(ctx, Target{
 			Name:        "FuzzTarget",
 			Package:     "seedfile",
 			RootPackage: "seedfile",
@@ -50,7 +50,7 @@ func TestFuzz(t *testing.T) {
 		removeTestData()
 		t.Cleanup(removeTestData)
 
-		err := p.Fuzz(ctx, TestTarget{
+		err := p.Fuzz(ctx, Target{
 			Name:        "FuzzTarget",
 			Package:     "github.com/form3tech-oss/new",
 			RootPackage: "github.com/form3tech-oss/new",
@@ -67,7 +67,7 @@ func TestFuzz(t *testing.T) {
 		ctx := context.Background()
 		p := Project{Directory: "./testdata/fuzzing/nofindings", Quiet: true}
 
-		err := p.Fuzz(ctx, TestTarget{
+		err := p.Fuzz(ctx, Target{
 			Name:        "FuzzTarget",
 			Package:     "nofindings",
 			RootPackage: "nofindings",

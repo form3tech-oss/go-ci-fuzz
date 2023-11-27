@@ -43,7 +43,7 @@ func (f FailingInputError) Error() string {
 	return fmt.Sprintf("failing %s input: %s", newOrSeed, f.ID)
 }
 
-func (p *Project) relCorpusDir(target TestTarget) (string, error) {
+func (p *Project) relCorpusDir(target Target) (string, error) {
 	// target.Package contains the root package as well
 	// we need to strip it because it refers to the current working directory.
 	pkg, err := filepath.Rel(target.RootPackage, target.Package)
@@ -53,7 +53,7 @@ func (p *Project) relCorpusDir(target TestTarget) (string, error) {
 	return filepath.Join(pkg, "testdata/fuzz", target.Name), nil
 }
 
-func (p *Project) Fuzz(ctx context.Context, target TestTarget, d time.Duration) error {
+func (p *Project) Fuzz(ctx context.Context, target Target, d time.Duration) error {
 	args := []string{
 		"test",
 		"-test.run=^$",

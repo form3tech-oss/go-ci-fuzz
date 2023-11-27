@@ -12,7 +12,7 @@ func TestDiscoverTargets(t *testing.T) {
 		ctx := context.Background()
 		targets, err := p.ListFuzzTargets(ctx, ".")
 		assert.NoError(t, err)
-		assert.EqualValues(t, []TestTarget{{
+		assert.EqualValues(t, []Target{{
 			Name:        "FuzzTarget",
 			Package:     "discover",
 			RootPackage: "discover",
@@ -23,7 +23,7 @@ func TestDiscoverTargets(t *testing.T) {
 		ctx := context.Background()
 		targets, err := p.ListFuzzTargets(ctx, "...")
 		assert.NoError(t, err)
-		assert.ElementsMatch(t, []TestTarget{{
+		assert.ElementsMatch(t, []Target{{
 			Name:        "FuzzTarget",
 			Package:     "discover",
 			RootPackage: "discover",
@@ -48,7 +48,7 @@ func TestDiscoverTargets(t *testing.T) {
 		ctx := context.Background()
 		targets, err := p.ListFuzzTargets(ctx, "subpackage")
 		assert.NoError(t, err)
-		assert.ElementsMatch(t, []TestTarget{{
+		assert.ElementsMatch(t, []Target{{
 			Name:        "FuzzSubTarget",
 			Package:     "discover/subpackage",
 			RootPackage: "discover",
@@ -60,7 +60,7 @@ func TestDiscoverTargets(t *testing.T) {
 		ctx := context.Background()
 		targets, err := p.ListFuzzTargets(ctx, "...")
 		assert.NoError(t, err)
-		assert.ElementsMatch(t, []TestTarget{{
+		assert.ElementsMatch(t, []Target{{
 			Name:        "FuzzTarget",
 			Package:     "discovermain",
 			RootPackage: "discovermain",

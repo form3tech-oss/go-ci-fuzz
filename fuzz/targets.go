@@ -14,17 +14,17 @@ import (
 	"regexp"
 )
 
-type TestTarget struct {
+type Target struct {
 	Name        string
 	Package     string
 	RootPackage string
 }
 
-func (tt TestTarget) String() string {
-	return fmt.Sprintf("%s#%s", tt.Package, tt.Name)
+func (t Target) String() string {
+	return fmt.Sprintf("%s#%s", t.Package, t.Name)
 }
 
-func (p *Project) ListFuzzTargets(ctx context.Context, packages ...string) ([]TestTarget, error) {
+func (p *Project) ListFuzzTargets(ctx context.Context, packages ...string) ([]Target, error) {
 	relativePackages := make([]string, len(packages))
 	for i, pkg := range packages {
 		// NOTE: Go will look in GOPATH for packages that cannot be found in the current module which is slow and breaks the tool
@@ -91,7 +91,7 @@ func (p *Project) listPackages(ctx context.Context, packages ...string) ([]Packa
 
 // We cannot use go test -list because of this bug: https://github.com/golang/go/issues/25339
 // So we list all packages and test files and look for test targets ourselves by running go.Scanner
-func (p *Project) listTestTargets(ctx context.Context, pattern string, packages ...string) ([]TestTarget, error) {
+func (p *Project) listTestTargets(ctx context.Context, pattern string, packages ...string) ([]Target, error) {
 	pkgs, err := p.listPackages(ctx, packages...)
 	if err != nil {
 		return nil, fmt.Errorf("error listing packages: %w", err)
@@ -102,7 +102,7 @@ func (p *Project) listTestTargets(ctx context.Context, pattern string, packages 
 		return nil, fmt.Errorf("error compiling pattern")
 	}
 
-	var targets []TestTarget
+	var targets []Target
 
 	for _, pkg := range pkgs {
 		var testFiles []string
@@ -130,7 +130,7 @@ func (p *Project) listTestTargets(ctx context.Context, pattern string, packages 
 				}
 				if previousToken == token.FUNC && tok.IsLiteral() {
 					if pat.MatchString(lit) {
-						targets = append(targets, TestTarget{
+						targets = append(targets, Target{
 							Name:        lit,
 							Package:     pkg.ImportPath,
 							RootPackage: pkg.Module.Path,
