@@ -64,11 +64,12 @@ runs:
         echo "EXE_NAME=go-ci-fuzz${EXE_EXT}" >> "$GITHUB_OUTPUT"
     - id: fetch-asset
       name: Get Release Asset
-      uses: dsaltares/fetch-gh-release-asset@3942ce82f1192754cd487a86f03eef6eeb89b5da # 1.1.0
+      uses: dsaltares/fetch-gh-release-asset@cdaf216b2a5baa0f20eecbf460912cc9947f2577 # 1.1.0 + patch
       with:
         repo: 'form3tech-oss/go-ci-fuzz'
         version: ${{ inputs.version == 'latest' && 'latest' || format('tags/v{0}', inputs.version) }}
         file: ${{ steps.archive-info.outputs.ARCHIVE_PATH }}
+        token: ''
     - id: extract
       name: Extract go-ci-fuzz
       shell: bash
