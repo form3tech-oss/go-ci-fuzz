@@ -48,9 +48,9 @@ Here are the Github Action properties:
 ```yaml
 inputs:
   version:
-    description: "Version of go-ci-fuzz, e.g. latest or 0.1.2"
+    description: "Version of go-ci-fuzz, e.g. latest or 0.1.3"
     required: false
-    default: "0.1.2"
+    default: "0.1.3"
   source-path:
     description: "Path to the project's source code, current directory by default."
     required: false
