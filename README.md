@@ -48,9 +48,9 @@ Here are the Github Action properties:
 ```yaml
 inputs:
   version:
-    description: "Version of go-ci-fuzz, e.g. latest or 0.1.1"
+    description: "Version of go-ci-fuzz, e.g. latest or 0.1.2"
     required: false
-    default: "0.1.1"
+    default: "0.1.2"
   source-path:
     description: "Path to the project's source code, current directory by default."
     required: false
@@ -94,7 +94,7 @@ jobs:
         go-version: stable
     - name: Run fuzzers
       id: build
-      uses: form3tech-oss/go-ci-fuzz/ci/github-actions/fuzz@v0.1.1
+      uses: form3tech-oss/go-ci-fuzz/ci/github-actions/fuzz@196db179c18454423086c68c1e8a2645593e348d # v0.1.2
       with:
         fuzz-time: 5m
         fail-fast: true
@@ -123,7 +123,7 @@ jobs:
         go-version: stable
     - name: Run fuzzers
       id: build
-      uses: form3tech-oss/go-ci-fuzz/ci/github-actions/fuzz@v0.1.1
+      uses: form3tech-oss/go-ci-fuzz/ci/github-actions/fuzz@196db179c18454423086c68c1e8a2645593e348d # v0.1.2
       with:
         fuzz-time: 30m
         fail-fast: false
