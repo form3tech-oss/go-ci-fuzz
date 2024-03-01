@@ -2,9 +2,9 @@ name: "fuzz"
 description: "Runs fuzzing targets using go-ci-fuzz"
 inputs:
   version:
-    description: "Version of go-ci-fuzz, e.g. latest or 0.1.1"
+    description: "Version of go-ci-fuzz, e.g. latest or 0.1.2"
     required: false
-    default: "0.1.1"
+    default: "0.1.2"
   source-path:
     description: "Path to the project's source code, current directory by default."
     required: false
