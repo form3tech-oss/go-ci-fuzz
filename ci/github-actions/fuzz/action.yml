@@ -87,7 +87,7 @@ runs:
         mkdir -p $TEMP_DIR
         echo "FAILING_INPUTS_DIR=${TEMP_DIR}" >> "$GITHUB_OUTPUT"
         ${RUNNER_TEMP}/${{ steps.archive-info.outputs.EXE_NAME }} fuzz ./... --fuzz-time "${{ inputs.fuzz-time }}" --fail-fast="${{ inputs.fail-fast }}" --out="${TEMP_DIR}/"
-    - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392" # v4.0.0
+    - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
       if: 'failure()'
       with:
         name: ${{ inputs.artifact-name }}
