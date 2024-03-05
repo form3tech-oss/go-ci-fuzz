@@ -94,7 +94,7 @@ jobs:
         go-version: stable
     - name: Run fuzzers
       id: build
-      uses: form3tech-oss/go-ci-fuzz/ci/github-actions/fuzz@196db179c18454423086c68c1e8a2645593e348d # v0.1.2
+      uses: form3tech-oss/go-ci-fuzz/ci/github-actions/fuzz@2b38b4142d7fa5dde3823e60a358c28ed17635df # v0.1.3
       with:
         fuzz-time: 5m
         fail-fast: true
@@ -123,7 +123,7 @@ jobs:
         go-version: stable
     - name: Run fuzzers
       id: build
-      uses: form3tech-oss/go-ci-fuzz/ci/github-actions/fuzz@196db179c18454423086c68c1e8a2645593e348d # v0.1.2
+      uses: form3tech-oss/go-ci-fuzz/ci/github-actions/fuzz@2b38b4142d7fa5dde3823e60a358c28ed17635df # v0.1.3
       with:
         fuzz-time: 30m
         fail-fast: false
