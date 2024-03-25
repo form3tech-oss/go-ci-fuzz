@@ -67,7 +67,7 @@ runs:
         echo "ARCHIVE_PATH=go-ci-fuzz_${ARCHIVE_OS}_${ARCHIVE_ARCH}.${ARCHIVE_EXT}" >> "$GITHUB_OUTPUT"
         echo "EXE_NAME=go-ci-fuzz${EXE_EXT}" >> "$GITHUB_OUTPUT"
     - id: fetch-asset
-      name: Download Go Ci Fuzz release
+      name: Download Go CI Fuzz release
       shell: bash
       run: |
         set -euo pipefail

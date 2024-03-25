@@ -1,6 +1,6 @@
 name: test-github-action
 
-on: [ push ]
+on: [push]
 
 permissions:
   contents: read
