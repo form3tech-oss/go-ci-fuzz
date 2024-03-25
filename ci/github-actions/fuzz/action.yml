@@ -21,6 +21,10 @@ inputs:
     description: "Name of the artifact"
     required: false
     default: "failing-inputs"
+  checksum:
+    description: "Checksum of go-ci-fuzz archive. If empty skips verification"
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
@@ -72,6 +76,14 @@ runs:
         RELEASE=$(curl -H "Accept: application/vnd.github+json" "https://api.github.com/repos/form3tech-oss/go-ci-fuzz/releases/$REL_PATH")
         DOWNLOAD_PATH=$(<<<$RELEASE jq -r --arg file_name "$FILE_NAME" '.assets[] | select (.name == $file_name) | .browser_download_url')
         curl -L -o "$FILE_NAME" "$DOWNLOAD_PATH"
+        
+        if [ ! -z "${{ inputs.checksum }}" ]; then
+          echo "${{ inputs.checksum }} $FILE_NAME" | sha256sum -c
+          if [ $? != 0 ]; then
+            echo 'checksum does not match'
+            exit 1
+          fi
+        fi
     - id: extract
       name: Extract go-ci-fuzz
       shell: bash
@@ -91,7 +103,7 @@ runs:
         echo "FAILING_INPUTS_DIR=${TEMP_DIR}" >> "$GITHUB_OUTPUT"
         ${RUNNER_TEMP}/${{ steps.archive-info.outputs.EXE_NAME }} fuzz ./... --fuzz-time "${{ inputs.fuzz-time }}" --fail-fast="${{ inputs.fail-fast }}" --out="${TEMP_DIR}/"
     - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
-      if: 'failure()'
+      if: ${{ failure() && steps.fuzz.outcome == 'failure' }}
       with:
         name: ${{ inputs.artifact-name }}
         path: ${{ steps.fuzz.outputs.FAILING_INPUTS_DIR }}/

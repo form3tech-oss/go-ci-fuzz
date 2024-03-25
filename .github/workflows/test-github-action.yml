@@ -1,6 +1,6 @@
 name: test-github-action
 
-on: [push]
+on: [ push ]
 
 permissions:
   contents: read
@@ -48,3 +48,43 @@ jobs:
         # When a continue-on-error step fails, the outcome is failure, but the final conclusion is success.
         if: steps.fuzz.outcome != 'failure'
         run: exit 1
+  checksum-check:
+    strategy:
+      matrix:
+        case: [
+          {
+            checksum: "",
+            outcome: "success"
+          },
+          {
+            checksum: "7c764843d427939a61e09b1cd631412252a625c68e0e88b8d1bc110d1cfbd029",
+            outcome: "success"
+          },
+          {
+            checksum: "11111113d427939a61e09b1cd631412252a625c68e0e88b8d1bc110d1cfbd029",
+            outcome: "failure"
+          }
+        ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # v4.1.0
+        with:
+          go-version: stable
+      - name: Run fuzzers
+        id: fuzz
+        uses: ./ci/github-actions/fuzz
+        continue-on-error: true
+        with:
+          fuzz-time: 10s
+          fail-fast: true
+          source-path: fuzz/testdata/fuzzing/nofindings
+          version: 0.1.3
+          checksum: ${{ matrix.case.checksum }}
+      - name: Verify the outcome
+        # https://docs.github.com/en/actions/learn-github-actions/contexts#steps-context
+        # When a continue-on-error step fails, the outcome is failure, but the final conclusion is success.
+        if: ${{ steps.fuzz.outcome != matrix.case.outcome }}
+        run: |
+          echo "Test Failed - got: ${{ steps.fuzz.outcome }} != expected: ${{ matrix.case.outcome }}"
+          exit 1
