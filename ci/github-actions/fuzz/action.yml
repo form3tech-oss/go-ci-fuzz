@@ -73,9 +73,9 @@ runs:
         set -euo pipefail
         FILE_NAME=${{ steps.archive-info.outputs.ARCHIVE_PATH }}
         REL_PATH=${{ inputs.version == 'latest' && 'latest' || format('tags/v{0}', inputs.version) }}
-        RELEASE=$(curl -H "Accept: application/vnd.github+json" "https://api.github.com/repos/form3tech-oss/go-ci-fuzz/releases/$REL_PATH")
+        RELEASE=$(curl --retry 10 --retry-max-time 60 -H "Accept: application/vnd.github+json" "https://api.github.com/repos/form3tech-oss/go-ci-fuzz/releases/$REL_PATH")
         DOWNLOAD_PATH=$(<<<$RELEASE jq -r --arg file_name "$FILE_NAME" '.assets[] | select (.name == $file_name) | .browser_download_url')
-        curl -L -o "$FILE_NAME" "$DOWNLOAD_PATH"
+        curl --retry 10 --retry-max-time 60 -L -o "$FILE_NAME" "$DOWNLOAD_PATH"
         
         if [ ! -z "${{ inputs.checksum }}" ]; then
           echo "${{ inputs.checksum }} $FILE_NAME" | sha256sum -c
